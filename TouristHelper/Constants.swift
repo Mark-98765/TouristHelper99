@@ -36,7 +36,7 @@ struct Constants {
     
     // MARK: - Globally used Storyboard constants
     
-    // static let ...
+    
     
     // MARK: - All Text Strings
     
