@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Alamofire
+import MapKit
 
 
 extension Constants {
@@ -53,6 +54,8 @@ class TransactionService {
     static let foursquareClientSecret = "VDBUUTJMMDF1EJKYC5E4EQ3YFHA4KX2RVO30GIUA2TSI55Y0"
     static let foursquareApiBaseAddress = "https://api.foursquare.com"
     static let foursquareApiVersion = "v2"
+    
+    static let googleDirectionsApiKey = "AIzaSyBGJTC-yg3LVf3YLnhXZbZSDj3PycU1pbg"
     
     static func ApiBaseAddress() -> String {
         // Return the api base depending on various stuff...
@@ -236,6 +239,63 @@ class TransactionService {
             }
         }
     }
+    
+    static func getDirections(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, waypointCoordinates: [CLLocationCoordinate2D],
+                              completion: @escaping (_ response: ServiceResponse, _ data: Any?) -> Void) {
+        let requestCall: ServerRequestCall = .getDirections
+        
+        /*
+        if waypointCoordinates.count == 0 {
+            return
+        }
+        */
+        
+        var urlString = "https://maps.googleapis.com/maps/api/directions/json?"
+        urlString += "origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)"
+        urlString += "&mode=walking"
+        
+        urlString += "&waypoints="
+        
+        var idx: Int = 0
+        for waypoint in waypointCoordinates {
+            if idx == 0 {
+                urlString += "\(waypoint.latitude),\(waypoint.longitude)"
+            } else {
+                urlString += "|\(waypoint.latitude),\(waypoint.longitude)"
+            }
+            idx += 1
+        }
+        
+        urlString += "&key=\(googleDirectionsApiKey)"
+        printLog("urlString=\(urlString)")
+        
+        guard let urlEncoded = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let requestUrl = URL(string: urlEncoded) else {
+                printLog("nil requestURL")
+                return
+        }
+        
+        printLog("requestUrl=\(requestUrl)")
+        
+        let request = Alamofire.request(requestUrl, method: .get, parameters: nil, encoding: JSONEncoding.default)
+        let start = CACurrentMediaTime()
+        request.validate()
+        request.responseJSON() { response in
+            let end = CACurrentMediaTime()
+            printLog("\(requestCall.rawValue) duration=\(end - start)")
+            
+            switch response.result {
+            case .success:
+                let serviceResponse = ServiceResponse(status: .success, serviceResponseError: nil, serverRequest: requestCall)
+                completion(serviceResponse, response.result.value) // Return the map region we used for this request (to test if it's changed in the meantime)
+            case .failure(let error):
+                printLog("\(requestCall.rawValue) server return error:\(error)")
+                let returnError = ServiceResponseError(alamofireError: response.error, statusCode: response.response?.statusCode, errorData: response.data)
+                let serviceResponse = ServiceResponse(status: .fail, serviceResponseError: returnError, serverRequest: requestCall)
+                completion(serviceResponse, nil)
+            }
+        }
+    }
 }
 
 
@@ -258,6 +318,7 @@ struct ServiceResponseError: Error {
 
 enum ServerRequestCall: String {
     case getPlacesOfInterest = "getPlacesOfInterest"
+    case getDirections = "getDirections"
     case getSystemInfo = "getSystemInfo"
     
     func urlString() -> String {

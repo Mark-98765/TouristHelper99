@@ -322,9 +322,14 @@ class MapViewController: UIViewController {
             return
         }
         
-        // Show the route
+        guard let tbc = tabBarViewController,
+              let placesOfInterest = tbc.placesOfInterest, placesOfInterest.count > 2,
+              let coordinates = PlaceOfInterest.waypointCoordinatesForDirections(placesOfInterest) else {
+                printLog("showRoute() Can't get coordinates")
+            return
+        }
         
-        
+        addRouteForAllPlacesOfInterest(startCoordinate: CLLocationCoordinate2D(latitude: lastLocation.0, longitude: lastLocation.1), coordinates: coordinates)
     }
     
     func showPins() {
@@ -384,6 +389,8 @@ class MapViewController: UIViewController {
         for overlay in mapView.overlays {
             if overlay.isKind(of: PlaceOfInterestDensityCircleOverlay.self) {
                 overlaysToRemove.append(overlay)
+            } else if overlay.isKind(of: RouteOverlay.self) {
+                overlaysToRemove.append(overlay)
             }
         }
         mapView.removeOverlays(overlaysToRemove)
@@ -438,6 +445,22 @@ class MapViewController: UIViewController {
             selectedAnnotation.annotationType = .allPlacesOfInterest
             mapView.addAnnotation(selectedAnnotation)
         }
+    }
+    
+    func addRouteForAllPlacesOfInterest(startCoordinate: CLLocationCoordinate2D, coordinates: [CLLocationCoordinate2D]) {
+        
+        var places = coordinates
+        places.insert(startCoordinate, at: 0)
+        places.append(startCoordinate)
+        
+        // Really guys?
+        // Give an expected time of 8 hours to do the whole app and also expect a working implementation of Dijkstra's algorithm?
+        // Hmmm.
+        // This is what happens when you set arbitrary deadlines.
+ 
+        let geodesic = RouteOverlay(coordinates: places, count: places.count)
+        mapView.add(geodesic)
+        
     }
     
     // MARK: - Location
@@ -744,6 +767,7 @@ extension MapViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let overlayView = overlay as? PlaceOfInterestDensityCircleOverlay {
+            printLog("MapViewController rendererFor MKCircle")
             //  MKCircle
             guard let placeOfInterestGrid = overlayView.placeOfInterestGrid else { return MKOverlayRenderer(overlay: overlay) }
             
@@ -752,6 +776,13 @@ extension MapViewController: MKMapViewDelegate {
             circleRenderer.strokeColor = placeOfInterestGrid.strokeColor
             circleRenderer.lineWidth = placeOfInterestGrid.lineWidth
             return circleRenderer
+        } else if let overlayView = overlay as? RouteOverlay {
+            printLog("MapViewController rendererFor MKPolyline")
+            //  MKPolyline
+            let renderer = MKPolylineRenderer(polyline: overlayView)
+            renderer.strokeColor = UIColor.red
+            renderer.lineWidth = 2
+            return renderer
         }
         
         return MKOverlayRenderer(overlay: overlay)
@@ -860,6 +891,48 @@ extension MapViewController {
                 }
             }
         }
+        
+    }
+    
+    func getDirections() {
+        printLog("MapViewController getDirections()")
+        
+        guard let lastLocation = UserPrefs.lastLocation(),
+              let mapRegion = UserPrefs.currentMapRegion(),
+              let placesCoordinates = PlaceOfInterest.waypointCoordinatesForDirections(tabBarViewController?.placesOfInterest) else {
+            return
+        }
+        
+        let origin = CLLocationCoordinate2D(latitude: lastLocation.0, longitude: lastLocation.1)
+        
+        showActivityIndicator()
+        TransactionService.getDirections(origin: origin, destination: origin, waypointCoordinates: placesCoordinates) { [weak self] (response, data) in
+            guard let strongSelf = self else { return }
+            printLog("getDirections() call completed")
+            DispatchQueue.main.async {
+                strongSelf.hideActivityIndicator()
+            }
+            
+            if mapRegion != UserPrefs.currentMapRegion() {
+                // They've moved the map in the meantime. Don't worry about this request.
+                printLog("MapViewController  getDirections() map region has changed. Aborting.")
+                return
+            }
+            
+            if response.status == .success {
+                printLog("getDirections() data=\(String(describing: data))")
+                
+                
+                
+            } else {
+                // Error
+                DispatchQueue.main.async {
+                    TransactionService.processServerError(response, presentingViewController: strongSelf)
+                }
+            }
+        }
+        
+        
         
     }
     

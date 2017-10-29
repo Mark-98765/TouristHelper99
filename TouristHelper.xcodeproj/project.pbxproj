@@ -35,6 +35,7 @@
 		459DBCA81FA1BA1500ED2991 /* TransactionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459DBCA71FA1BA1500ED2991 /* TransactionService.swift */; };
 		459DBCAA1FA1C7A100ED2991 /* ListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459DBCA91FA1C7A100ED2991 /* ListTableViewCell.swift */; };
 		459DBCAC1FA1C7B200ED2991 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459DBCAB1FA1C7B200ED2991 /* SettingsTableViewCell.swift */; };
+		459DBCAE1FA6898900ED2991 /* RouteOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459DBCAD1FA6898900ED2991 /* RouteOverlay.swift */; };
 		8BCECE1A493DED2926BE61EA /* Pods_TouristHelperTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D773F1BE8059F4D15CD09DA1 /* Pods_TouristHelperTests.framework */; };
 		A87C028295B00922F2348B6B /* Pods_TouristHelper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA59F9569F5ABD2C52FE0976 /* Pods_TouristHelper.framework */; };
 		D0661A72023039BC1F126715 /* Pods_TouristHelperUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8830F7908F1C4592389F9539 /* Pods_TouristHelperUITests.framework */; };
@@ -94,6 +95,7 @@
 		459DBCA71FA1BA1500ED2991 /* TransactionService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionService.swift; sourceTree = "<group>"; };
 		459DBCA91FA1C7A100ED2991 /* ListTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListTableViewCell.swift; sourceTree = "<group>"; };
 		459DBCAB1FA1C7B200ED2991 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
+		459DBCAD1FA6898900ED2991 /* RouteOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouteOverlay.swift; sourceTree = "<group>"; };
 		61C34FD3D3795006FEE27F04 /* Pods-TouristHelperUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TouristHelperUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TouristHelperUITests/Pods-TouristHelperUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		68B3B16827BFED5EE8247BE0 /* Pods-TouristHelperUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TouristHelperUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TouristHelperUITests/Pods-TouristHelperUITests.release.xcconfig"; sourceTree = "<group>"; };
 		8830F7908F1C4592389F9539 /* Pods_TouristHelperUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TouristHelperUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -231,6 +233,7 @@
 				459DBC9D1FA1B0D500ED2991 /* PlaceOfInterestDensityCircleOverlay.swift */,
 				459DBC9F1FA1B12000ED2991 /* PlaceOfInterestGrid.swift */,
 				459DBCA11FA1B27A00ED2991 /* PlaceOfInterestDensityColor.swift */,
+				459DBCAD1FA6898900ED2991 /* RouteOverlay.swift */,
 			);
 			name = "Data Structs";
 			sourceTree = "<group>";
@@ -582,6 +585,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				459DBCAE1FA6898900ED2991 /* RouteOverlay.swift in Sources */,
 				459DBC9E1FA1B0D500ED2991 /* PlaceOfInterestDensityCircleOverlay.swift in Sources */,
 				459DBC981FA161DB00ED2991 /* MapRegion.swift in Sources */,
 				459DBC861FA13C2000ED2991 /* Utility.swift in Sources */,

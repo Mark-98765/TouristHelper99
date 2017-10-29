@@ -57,6 +57,22 @@ struct PlaceOfInterest {
         return placesOfInterest
     }
     
+    static func waypointCoordinatesForDirections(_ placesOfInterest: [PlaceOfInterest]?) -> [CLLocationCoordinate2D]? {
+        guard let points = placesOfInterest, points.count > 0 else {
+            return nil
+        }
+        
+        let places = points.sorted {
+            $0.distanceFromHere < $1.distanceFromHere
+        }
+        
+        var waypoints = [CLLocationCoordinate2D]()
+        for place in places {
+            waypoints.append(CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude))
+        }
+        return waypoints
+    }
+    
     
 }
 
