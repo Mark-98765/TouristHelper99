@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import MapKit
 
 // MARK: - Some useful extensions to base classes
 
@@ -114,6 +115,12 @@ extension UITextField {
         self.layer.addSublayer(border)
         self.layer.masksToBounds = true
     }
+}
+
+extension CLLocationCoordinate2D: Equatable {}
+
+public func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+    return (lhs.latitude == rhs.latitude) && (lhs.longitude == rhs.longitude)
 }
 
 

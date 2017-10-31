@@ -448,19 +448,112 @@ class MapViewController: UIViewController {
     }
     
     func addRouteForAllPlacesOfInterest(startCoordinate: CLLocationCoordinate2D, coordinates: [CLLocationCoordinate2D]) {
+        guard let firstCoordinate = coordinates.first else {
+            // No places to route
+            return
+        }
         
-        var places = coordinates
+        printLog("addRouteForAllPlacesOfInterest()")
+        printLog("coordinates.count=\(coordinates.count)")
+        
+        var finalRoutePlaces = [CLLocationCoordinate2D]()
+        finalRoutePlaces.append(startCoordinate)
+        
+        let places = coordinates
+        
+        
+        /*
         places.insert(startCoordinate, at: 0)
         places.append(startCoordinate)
         
-        // Really guys?
-        // Give an expected time of 8 hours to do the whole app and also expect a working implementation of Dijkstra's algorithm?
-        // Hmmm.
-        // This is what happens when you set arbitrary deadlines.
- 
         let geodesic = RouteOverlay(coordinates: places, count: places.count)
         mapView.add(geodesic)
+        */
         
+        var placesLhs = [CLLocationCoordinate2D]()
+        var placesRhs = [CLLocationCoordinate2D]()
+        for place in places {
+            if place.longitude <= startCoordinate.longitude {
+                placesLhs.append(place)
+            } else {
+                placesRhs.append(place)
+            }
+        }
+        
+        printLog("placesLhs.count=\(placesLhs.count) placesRhs.count=\(placesRhs.count)")
+        
+        var outwardPlacesLhs = [CLLocationCoordinate2D]()
+        var inwardPlacesLhs = [CLLocationCoordinate2D]()
+        var idxLhs: Int = 0
+        for place in placesLhs {
+            if idxLhs % 2 == 0 {
+                outwardPlacesLhs.append(place)
+            } else {
+                inwardPlacesLhs.append(place)
+            }
+            idxLhs += 1
+        }
+        
+        let inwardPlacesLhsReversed = inwardPlacesLhs.reversed()
+        printLog("outwardPlacesLhs.count=\(outwardPlacesLhs.count) inwardPlacesLhsReversed.count=\(inwardPlacesLhsReversed.count)")
+        
+        var outwardPlacesRhs = [CLLocationCoordinate2D]()
+        var inwardPlacesRhs = [CLLocationCoordinate2D]()
+        var idxRhs: Int = 0
+        for place in placesRhs {
+            if idxRhs % 2 == 0 {
+                outwardPlacesRhs.append(place)
+            } else {
+                inwardPlacesRhs.append(place)
+            }
+            idxRhs += 1
+        }
+        
+        let inwardPlacesRhsReversed = inwardPlacesRhs.reversed()
+        printLog("outwardPlacesRhs.count=\(outwardPlacesRhs.count) inwardPlacesRhsReversed.count=\(inwardPlacesRhsReversed.count)")
+        
+        if firstCoordinate.longitude <= startCoordinate.longitude {
+            // Start on the LHS
+            for place in outwardPlacesLhs {
+                finalRoutePlaces.append(place)
+            }
+            for place in inwardPlacesLhsReversed {
+                finalRoutePlaces.append(place)
+            }
+            
+            // Now add the other side
+            for place in outwardPlacesRhs {
+                finalRoutePlaces.append(place)
+            }
+            for place in inwardPlacesRhsReversed {
+                finalRoutePlaces.append(place)
+            }
+            
+            finalRoutePlaces.append(startCoordinate)
+            
+        } else {
+            // Start on the RHS
+            for place in outwardPlacesRhs {
+                finalRoutePlaces.append(place)
+            }
+            for place in inwardPlacesRhsReversed {
+                finalRoutePlaces.append(place)
+            }
+            
+            // Now add the other side
+            for place in outwardPlacesLhs {
+                finalRoutePlaces.append(place)
+            }
+            for place in inwardPlacesLhsReversed {
+                finalRoutePlaces.append(place)
+            }
+            
+            finalRoutePlaces.append(startCoordinate)
+        }
+        
+        printLog("finalRoutePlaces.count=\(finalRoutePlaces.count)")
+        let geodesic = RouteOverlay(coordinates: finalRoutePlaces, count: finalRoutePlaces.count)
+        mapView.add(geodesic)
     }
     
     // MARK: - Location
